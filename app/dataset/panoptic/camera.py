@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import Dict, List
 
+import numpy as np
 import torch
 from matplotlib import pyplot as plt
 
@@ -56,18 +57,19 @@ def vec3_to_mat4(vec3: torch.Tensor) -> torch.Tensor:
     return mat4
 
 
-def display_points(x: torch.Tensor, P4: torch.Tensor, image: torch.Tensor):
+def display_points(x: torch.Tensor, P4: torch.Tensor, image: torch.Tensor, resolution_ratio: float = 1.0):
     """
     Displays skeleton joints on image
-    :param x: joints of shape (4, 19)
+    :param x: joints of shape (19, 4)
     :param P4: 4x4 camera projection matrix
     :param image: 3xHxW image to display joints on.
     :return: None
     """
+    x = x.T
     x_homo = P4 @ x
-    x_proj = x_homo[:, :] / x_homo[2:3, :]
+    x_proj = x_homo[:2, :] / x_homo[2:3, :] * resolution_ratio
 
-    body_edges = torch.Tensor([[1, 2], [1, 4], [4, 5], [5, 6], [1, 3], [3, 7], [7, 8], [8, 9], [3, 13], [13, 14], [14, 15], [1, 10], [10, 11], [11, 12]]) - 1
+    body_edges = np.array([[1, 2], [1, 4], [4, 5], [5, 6], [1, 3], [3, 7], [7, 8], [8, 9], [3, 13], [13, 14], [14, 15], [1, 10], [10, 11], [11, 12]]) - 1
 
     plt.figure(figsize=(15, 15))
     plt.imshow(torch.permute(image, (1, 2, 0)))

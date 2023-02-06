@@ -9,8 +9,9 @@ from app.dataset.panoptic.joints import load_joints_with_single_person
 
 
 class FlatPanopticClip(torch.utils.data.Dataset):
-    def __init__(self, clip_path: Path):
+    def __init__(self, clip_path: Path, transforms):
         self.clip_path = clip_path
+        self.transforms = transforms
 
         self.camera_matrices: Dict[str, torch.Tensor] = {
             camera_name: load_camera_matrix(camera_calib)
@@ -32,9 +33,9 @@ class FlatPanopticClip(torch.utils.data.Dataset):
         joints: torch.Tensor = list(joints.values())[0]
         return {
             "joints": joints,
-            "P": self.camera_matrices[camera_name],
-            "inv_P": self.inv_camera_matrices[camera_name],
-            "image": load_frame(self.clip_path, camera_name, frame_index)
+            "p": self.camera_matrices[camera_name],
+            "inv_p": self.inv_camera_matrices[camera_name],
+            "image": load_frame(self.clip_path, camera_name, frame_index, self.transforms)
         }
 
     def __len__(self) -> int:

@@ -7,11 +7,11 @@ from PIL import Image
 import torchvision
 
 
-def load_frame(clip_path: Path, camera_name: str, frame: int) -> torch.Tensor:
+def load_frame(clip_path: Path, camera_name: str, frame: int, transforms) -> torch.Tensor:
     frame_path = clip_path / "hdImgs" / camera_name / f"{camera_name}_{frame:08d}.jpg"
     image = Image.open(frame_path)
-    transform = torchvision.transforms.ToTensor()
-    return transform(image)
+    transforms = transforms or torchvision.transforms.ToTensor()
+    return transforms(image)
 
 
 def list_frames(clip_path: Path, camera_name: str) -> List[int]:

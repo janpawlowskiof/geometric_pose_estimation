@@ -40,4 +40,7 @@ def load_joints_for_frame(frame_config_path: Path) -> Dict[int, torch.Tensor]:
 
 def reshape_joints(joints: List[float]) -> torch.Tensor:
     joints = torch.Tensor(joints)
-    return joints.reshape([19, 4])
+    joints = joints.reshape([19, 4])
+    # TODO: This is bad because I am overwriting confidence values
+    joints[:, 3] = 1
+    return joints.T
